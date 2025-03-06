@@ -42,7 +42,7 @@ exports.list = async (req, res) => {
         const { count } = req.params
         const products = await prisma.product.findMany({
             take: parseInt(count),
-            orderBy: { createdAt: "desc" },
+            orderBy: { createdAt: "desc" }, // เรียงลำดับโดย createdAt จากใหม่ไปเก่า
             include: {
                 category: true,
                 images: true
@@ -178,8 +178,10 @@ const handleQuery = async (req, res, query) => {
                 // title: { // ของเดิมค้นหาจาก ชื่อสินค้า
                 description: { // ค้นหาจาก รายละเอียดสินค้า
                     contains: query,
+                    
                 }
             },
+            orderBy: { createdAt: "desc" }, // เรียงลำดับโดย createdAt จากใหม่ไปเก่า
             include: {
                 category: true,
                 images: true
@@ -202,6 +204,7 @@ const handlePrice = async (req, res, priceRange) => {
                     lte: priceRange[1]
                 }
             },
+            orderBy: { price: "asc" }, // เรียงลำดับโดย price จากน้อยไปมาก
             include: {
                 category: true,
                 images: true
@@ -221,6 +224,7 @@ const handleCategory = async (req, res, categoryId) => {
                     in: categoryId.map((id) => Number(id))
                 }
             },
+            orderBy: { createdAt: "desc" }, // เรียงลำดับโดย createdAt จากใหม่ไปเก่า
             include: {
                 category: true,
                 images: true
