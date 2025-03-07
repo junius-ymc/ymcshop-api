@@ -40,13 +40,15 @@ exports.list = async (req, res) => {
     try {
         // code
         const { count } = req.params
+        const { page = 1 } = req.query;
+        const limit = parseInt(count);
+        const skip = (parseInt(page) - 1) * limit;
+
         const products = await prisma.product.findMany({
-            take: parseInt(count),
+            take: limit,
+            skip: skip,
             orderBy: { createdAt: "desc" }, // เรียงลำดับโดย createdAt จากใหม่ไปเก่า
-            include: {
-                category: true,
-                images: true
-            }
+            include: { category: true, images: true },
         })
         res.send(products)
     } catch (err) {
@@ -178,7 +180,7 @@ const handleQuery = async (req, res, query) => {
                 // title: { // ของเดิมค้นหาจาก ชื่อสินค้า
                 description: { // ค้นหาจาก รายละเอียดสินค้า
                     contains: query,
-                    
+
                 }
             },
             orderBy: { createdAt: "desc" }, // เรียงลำดับโดย createdAt จากใหม่ไปเก่า
