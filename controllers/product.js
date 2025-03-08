@@ -43,6 +43,8 @@ exports.list = async (req, res) => {
         const { page = 1 } = req.query;
         const limit = parseInt(count);
         const skip = (parseInt(page) - 1) * limit;
+        const totalProducts = await prisma.product.count(); // ✅ นับสินค้าทั้งหมด
+        const totalPages = Math.ceil(totalProducts / 4); // ✅ คำนวณจำนวนหน้า (4 ชิ้นต่อ 1 หน้า)
 
         const products = await prisma.product.findMany({
             take: limit,
@@ -50,7 +52,7 @@ exports.list = async (req, res) => {
             orderBy: { createdAt: "desc" }, // เรียงลำดับโดย createdAt จากใหม่ไปเก่า
             include: { category: true, images: true },
         })
-        res.send(products)
+        res.send({ products, totalPages }); // ✅ ส่งค่าจำนวนหน้ากลับไป
     } catch (err) {
         console.log(err)
         res.status(500).json({ message: "Server error" })
