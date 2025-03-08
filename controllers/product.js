@@ -40,11 +40,11 @@ exports.list = async (req, res) => {
     try {
         // code
         const { count } = req.params
-        const { page = 1 } = req.query;
+        const { page = 1, itemsPerPage = 4 } = req.query; // ✅ รับค่าจำนวนสินค้าต่อหน้า
         const limit = parseInt(count);
         const skip = (parseInt(page) - 1) * limit;
         const totalProducts = await prisma.product.count(); // ✅ นับสินค้าทั้งหมด
-        const totalPages = Math.ceil(totalProducts / 4); // ✅ คำนวณจำนวนหน้า (4 ชิ้นต่อ 1 หน้า)
+        const totalPages = Math.ceil(totalProducts / limit); // ✅ คำนวณจำนวนหน้า (ค่าที่ส่งมาจากหน้าบ้าน ชิ้นต่อ 1 หน้า)
 
         const products = await prisma.product.findMany({
             take: limit,
