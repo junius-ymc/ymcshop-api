@@ -199,6 +199,7 @@ const handleQuery = async (req, res, query) => {
                 category: true,
                 images: true
             }
+
         })
         res.send(products)
     } catch (err) {
@@ -257,11 +258,12 @@ exports.searchFilters = async (req, res) => {
         const searchQuery = query ? query.toLowerCase() : ""; // ✅ แปลงเป็นพิมพ์เล็ก
 
         if (query) {
-            console.log('query-->', query)
+            console.log('query-->', searchQuery); // ✅ Debug ดูค่าก่อนส่งไป Prisma
+            // console.log('query-->', query)
             await handleQuery(req, res, query)
         }
         if (category) {
-            console.log('query-->', searchQuery); // ✅ Debug ดูค่าก่อนส่งไป Prisma
+            console.log('category-->', category)
             await handleCategory(req, res, category)
         }
         if (price) {
