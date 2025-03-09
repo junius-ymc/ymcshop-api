@@ -179,18 +179,26 @@ const handleQuery = async (req, res, query) => {
         //code
         const products = await prisma.product.findMany({
             where: {
-                // title: { // ของเดิมค้นหาจาก ชื่อสินค้า
-                description: { // ค้นหาจาก รายละเอียดสินค้า
-                    contains: query,
-
-                }
+                OR: [
+                    {
+                        title: { // ของเดิมค้นหาจาก ชื่อสินค้า
+                            contains: query,
+                            mode: "insensitive" // ✅ ไม่สนตัวพิมพ์ใหญ่-เล็ก
+                        }
+                    },
+                    {
+                        description: { // ค้นหาจาก รายละเอียดสินค้า
+                            contains: query,
+                            mode: "insensitive" // ✅ ไม่สนตัวพิมพ์ใหญ่-เล็ก
+                        }
+                    }
+                ]
             },
             orderBy: { createdAt: "desc" }, // เรียงลำดับโดย createdAt จากใหม่ไปเก่า
             include: {
                 category: true,
                 images: true
             }
-
         })
         res.send(products)
     } catch (err) {
