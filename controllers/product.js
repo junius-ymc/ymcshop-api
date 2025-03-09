@@ -244,14 +244,16 @@ const handleCategory = async (req, res, categoryId) => {
 exports.searchFilters = async (req, res) => {
     try {
         // code
+        console.log("ค่าที่ถูกส่งมาจาก Frontend:", req.body); // ✅ Debug ดูค่าที่ส่งมา
         const { query, category, price } = req.body
+        const searchQuery = query ? query.toLowerCase() : ""; // ✅ แปลงเป็นพิมพ์เล็ก
 
         if (query) {
             console.log('query-->', query)
             await handleQuery(req, res, query)
         }
         if (category) {
-            console.log('category-->', category)
+            console.log('query-->', searchQuery); // ✅ Debug ดูค่าก่อนส่งไป Prisma
             await handleCategory(req, res, category)
         }
         if (price) {
