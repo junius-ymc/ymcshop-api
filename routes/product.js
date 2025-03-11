@@ -9,12 +9,17 @@ const { create,
     listby,
     searchFilters,
     createImages,
-    removeImage
+    removeImage,
+    getProductPage // ✅ เพิ่มฟังก์ชันนี้
 } = require('../controllers/product')
 const { authCheck, adminCheck } = require('../middlewares/authCheck')
 // @ENDPOINT https://ymc-shop-api.vercel.app/api/product
 router.post('/product', create)
-router.get('/products/:count', list)
+// router.get('/products/:count', list)
+// ✅ เพิ่ม route นี้
+router.get('/products', list);
+router.get('/products/:productId/page', getProductPage);
+
 router.get('/product/:id', read)
 router.put('/product/:id', update)
 router.delete('/product/:id', remove)
@@ -23,8 +28,6 @@ router.post('/search/filters', searchFilters)
 
 router.post('/images', authCheck, adminCheck, createImages)
 router.post('/removeimages', authCheck, adminCheck, removeImage)
-
-
 
 
 module.exports = router
