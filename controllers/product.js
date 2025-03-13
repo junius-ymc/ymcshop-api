@@ -39,29 +39,16 @@ exports.create = async (req, res) => {
 exports.list = async (req, res) => {
     try {
         // code
-        // ✅ รับค่า count และ page จาก query parameters
-        const { count = 4, page = 1 } = req.query;
-        const limit = parseInt(count);
-        const skip = (parseInt(page) - 1) * limit;
-
-        // นับสินค้าทั้งหมด
-        const totalProducts = await prisma.product.count();
-        const totalPages = Math.ceil(totalProducts / limit); // ✅ คำนวณจำนวนหน้า (ค่าที่ส่งมาจากหน้าบ้าน ชิ้นต่อ 1 หน้า)
-
-        // ดึงสินค้าตามหน้า
+        const { count } = req.params
         const products = await prisma.product.findMany({
-            take: limit,
-            skip: skip,
-            orderBy: { createdAt: "desc" }, // เรียงลำดับโดย createdAt จากใหม่ไปเก่า
-            include: { category: true, images: true },
+            take: parseInt(count),
+            orderBy: { createdAt: "desc" },
+            include: {
+                category: true,
+                images: true
+            }
         })
-        // // ✅ ส่งค่าจำนวนหน้ากลับไป
-        res.send({
-            products,
-            totalPages,
-            currentPage: parseInt(page),
-            itemsPerPage: limit
-        });
+        res.send(products)
     } catch (err) {
         console.log(err)
         res.status(500).json({ message: "Server error" })
@@ -318,27 +305,3 @@ exports.removeImage = async (req, res) => {
         res.status(500).json({ message: "Server Error" })
     }
 }
-// ✅ เพิ่มฟังก์ชันนี้
-exports.getProductPage = async (req, res) => {
-    const { productId } = req.params;
-    const { itemsPerPage = 4 } = req.query;
-
-    try {
-        // หาลำดับของสินค้าในฐานข้อมูลทั้งหมด
-        const allProducts = await prisma.product.findMany({
-            orderBy: { createdAt: "desc" }, // เรียงลำดับตาม createdAt จากใหม่ไปเก่า
-        });
-        const productIndex = allProducts.findIndex(p => p.id === parseInt(productId));
-
-        if (productIndex === -1) {
-            return res.status(404).json({ error: 'Product not found' });
-        }
-
-        // คำนวณหน้า
-        const page = Math.floor(productIndex / itemsPerPage) + 1;
-        console.log("📦 คำนวณหน้าได้:", page); // ✅ เพิ่ม log เพื่อตรวจสอบ
-        res.json({ page }); // ✅ ส่งค่ากลับเป็น JSON
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to calculate page' });
-    }
-};

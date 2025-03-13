@@ -15,11 +15,7 @@ const { create,
 const { authCheck, adminCheck } = require('../middlewares/authCheck')
 // @ENDPOINT https://ymc-shop-api.vercel.app/api/product
 router.post('/product', create)
-// router.get('/products/:count', list)
-// ✅ เพิ่ม route นี้
-router.get('/products', list);
-router.get('/products/:productId/page', getProductPage);
-
+router.get('/products/:count', list);
 router.get('/product/:id', read)
 router.put('/product/:id', update)
 router.delete('/product/:id', remove)
