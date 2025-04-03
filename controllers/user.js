@@ -191,10 +191,10 @@ exports.saveAddress = async (req, res) => {
       },
     });
 
-    res.json({ ok: true, message: "Address update success" });
+    res.json({ ok: true, message: "Address update success", msgfromapi: '1' });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: "Server Error", msgfromapi: '2' });
   }
 };
 exports.saveOrder = async (req, res) => {
