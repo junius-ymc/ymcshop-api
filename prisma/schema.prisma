@@ -110,3 +110,12 @@ model Image {
   product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId  Int
 }
+
+model Contact {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  subject   String
+  message   String
+  createdAt DateTime @default(now())
+}
