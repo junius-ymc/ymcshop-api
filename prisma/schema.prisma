@@ -119,3 +119,18 @@ model Contact {
   message   String
   createdAt DateTime @default(now())
 }
+
+model Review {
+  id              Int      @id @default(autoincrement())
+  userName        String
+  reviewProduct   String
+  reviewProductId Int
+  orderedId       Int      @unique
+  enabled         Boolean  @default(false)
+  asset_id        String
+  public_id       String
+  url             String
+  secure_url      String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
