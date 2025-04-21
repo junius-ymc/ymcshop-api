@@ -40,3 +40,38 @@ exports.getOrderAdmin = async (req, res) => {
         res.status(500).json({ message: "Server error" })
     }
 }
+exports.getDashboardStats = async (req, res) => {
+    try {
+        const [orders, users, products, contacts, reviews] = await Promise.all([
+            prisma.order.findMany(),
+            prisma.user.findMany(),
+            prisma.product.findMany(),
+            prisma.contact.findMany(),
+            prisma.review.findMany(),
+        ]);
+
+        // ✅ นับข้อมูล "วันนี้"
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const ordersToday = orders.filter(o => new Date(o.createdAt) >= today).length;
+        const usersToday = users.filter(u => new Date(u.createdAt) >= today).length;
+        const contactsToday = contacts.filter(c => new Date(c.createdAt) >= today).length;
+        const reviewsToday = reviews.filter(r => new Date(r.createdAt) >= today).length;
+
+        res.json({
+            totalOrders: orders.length,
+            totalUsers: users.length,
+            totalProducts: products.length,
+            totalContacts: contacts.length,
+            totalReviews: reviews.length,
+            ordersToday,
+            usersToday,
+            contactsToday,
+            reviewsToday,
+        });
+    } catch (err) {
+        console.error("❌ Dashboard Stats Error:", err);
+        res.status(500).send("Server Error");
+    };
+};
