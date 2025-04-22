@@ -40,6 +40,7 @@ exports.getOrderAdmin = async (req, res) => {
         res.status(500).json({ message: "Server error" })
     }
 }
+
 exports.getDashboardStats = async (req, res) => {
     try {
         const [orders, users, products, contacts, reviews] = await Promise.all([
@@ -74,4 +75,23 @@ exports.getDashboardStats = async (req, res) => {
         console.error("❌ Dashboard Stats Error:", err);
         res.status(500).send("Server Error");
     };
+};
+
+exports.getRecentOrders = async (req, res) => {
+    try {
+        const recentOrders = await prisma.order.findMany({
+            orderBy: {
+                createdAt: "desc",
+            },
+            take: 5,
+            include: {
+                orderedBy: true, // ดึงชื่อผู้สั่ง
+            },
+        });
+
+        res.json(recentOrders);
+    } catch (error) {
+        console.error("❌ Error fetching recent orders:", error);
+        res.status(500).json({ message: "Server Error" });
+    }
 };
