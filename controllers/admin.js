@@ -95,3 +95,77 @@ exports.getRecentOrders = async (req, res) => {
         res.status(500).json({ message: "Server Error" });
     }
 };
+
+exports.getDailySalesChart = async (req, res) => {
+    try {
+        const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        const today = new Date();
+
+        const sales = await prisma.order.findMany({
+            where: {
+                createdAt: {
+                    gte: startOfMonth,
+                    lte: today
+                },
+                status: "succeeded"
+            },
+        });
+
+        // รวมยอดขายต่อวัน
+        const summary = {};
+        sales.forEach(order => {
+            const day = new Date(order.createdAt).toISOString().split("T")[0]; // yyyy-mm-dd
+            if (!summary[day]) summary[day] = 0;
+            summary[day] += order.cartTotal;
+        });
+
+        // แปลงให้ frontend ใช้ง่าย
+        const result = Object.keys(summary).map(day => ({
+            date: day,
+            total: summary[day]
+        }));
+
+        res.json(result);
+    } catch (err) {
+        console.error("❌ Error in getDailySalesChart:", err);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+
+exports.getDailySales = async (req, res) => {
+    try {
+        const start = new Date();
+        start.setDate(1); // วันแรกของเดือนนี้
+        start.setHours(0, 0, 0, 0);
+
+        const end = new Date(); // วันปัจจุบัน
+
+        const orders = await prisma.order.findMany({
+            where: {
+                createdAt: {
+                    gte: start,
+                    lte: end,
+                },
+            },
+        });
+
+        // Group by day
+        const dailySales = {};
+
+        orders.forEach((order) => {
+            const date = order.createdAt.toISOString().slice(0, 10); // yyyy-mm-dd
+            dailySales[date] = (dailySales[date] || 0) + order.amount;
+        });
+
+        // Convert to array
+        const result = Object.entries(dailySales).map(([date, totalSales]) => ({
+            date,
+            totalSales,
+        }));
+
+        res.json(result);
+    } catch (err) {
+        console.error("❌ Error in getDailySales:", err);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
