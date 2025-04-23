@@ -169,3 +169,46 @@ exports.getDailySales = async (req, res) => {
         res.status(500).json({ message: "Server Error" });
     }
 };
+
+exports.getMonthlySales = async (req, res) => {
+    try {
+        const currentYear = new Date().getFullYear();
+
+        const orders = await prisma.order.findMany({
+            where: {
+                status: "succeeded",
+                createdAt: {
+                    gte: new Date(`${currentYear}-01-01`),
+                    lte: new Date(`${currentYear}-12-31T23:59:59.999Z`),
+                },
+            },
+        });
+
+        // Group by month (0 = Jan, 11 = Dec)
+        const monthlySales = Array(12).fill(0);
+
+        orders.forEach((order) => {
+            const month = new Date(order.createdAt).getMonth();
+            monthlySales[month] += order.cartTotal;
+        });
+
+        // Convert to array with month name (Jan, Feb, ...)
+        const result = monthlySales.map((total, index) => {
+            const monthNames = [
+                // "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                // "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                "0", "1", "2", "3", "4", "5",
+                "6", "7", "8", "9", "10", "11"
+            ];
+            return {
+                month: monthNames[index],
+                total,
+            };
+        });
+
+        res.json(result);
+    } catch (err) {
+        console.error("❌ Error in getMonthlySales:", err);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
