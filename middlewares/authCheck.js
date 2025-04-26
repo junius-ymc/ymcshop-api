@@ -35,11 +35,14 @@ exports.adminCheck = async (req, res, next) => {
         const adminUser = await prisma.user.findFirst({
             where: { email: email }
         })
-        if (!adminUser || adminUser.role !== 'admin') {
-            return res.status(403).json({ message: 'Acess Denied: Admin Only' })
+        // if (!adminUser || adminUser.role !== 'admin') {
+        //     return res.status(403).json({ message: 'Acess Denied: Admin Only' })
+        // }
+        if (!adminUser || (adminUser.role !== 'admin' && adminUser.role !== 'staff')) {
+            return res.status(403).json({ message: 'Access Denied: Admin or Staff Only' });
         }
         // console.log('admin check', adminUser)
-        next()
+        next() // ผ่านได้ถ้าเป็น admin หรือ assistant
     } catch (err) {
         console.log(err)
         res.status(500).json({ message: 'Error Admin access denied' })
