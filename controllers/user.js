@@ -12,6 +12,8 @@ exports.listUsers = async (req, res) => {
         address: true,
         name: true,
         picture: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
     res.json(users);
