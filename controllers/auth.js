@@ -2,7 +2,6 @@ const prisma = require('../config/prisma')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
-
 exports.register = async (req, res) => {
     try {
         //code
@@ -61,6 +60,11 @@ exports.login = async (req, res) => {
         if (!isMatch) {
             return res.status(400).json({ message: 'Password Invalid !!!', errrr: '2' })
         }
+        // ✅ อัปเดต updatedAt
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { updatedAt: new Date() },
+        })
         // Step 3 Create Payload
         const payload = {
             id: user.id,
@@ -83,6 +87,7 @@ exports.login = async (req, res) => {
         res.status(500).json({ message: "Server Error" })
     }
 }
+
 exports.currentUser = async (req, res) => {
     try {
         //code
