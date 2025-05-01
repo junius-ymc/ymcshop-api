@@ -1,30 +1,46 @@
-// Step 1 import ....
-const express = require('express')
-const app = express()
-const morgan = require('morgan')
-const { readdirSync } = require('fs')
-const cors = require('cors')
-// const authRouter = require('./routes/auth')
-// const categoryRouter = require('./routes/category')
+const express = require('express');
+const app = express();
+const morgan = require('morgan');
+const cors = require('cors');
+const { readdirSync } = require('fs');
+const prerender = require('prerender-node');
 
-// middleware
-app.use(morgan('dev'))
-app.use(express.json({ limit: '20mb' }))
-app.use(cors())
-// app.use('/api',authRouter)
-// app.use('/api',categoryRouter)
-readdirSync('./routes')
-    .map((c) => app.use('/api', require('./routes/' + c)))
+// ✅ ใส่ Prerender Token ตรงนี้
+// prerender.set('prerenderToken', 'MJVQROCR6ltrN10nVTn3');
 
-// Step 3 Router
-// app.post('/api',(req,res)=>{
-//     // code
-//     const { username,password } = req.body
-//     console.log(username,password)
-//     res.send('Jukkru 555+')
-// })
-// Step 2 Start Server
-app.listen(5001,
-    () => console.log('Server is running on port 5001'))
+// // ✅ log เวลา bot เข้า (optional แต่แนะนำ)
+// prerender.set('beforeRender', function (req, done) {
+//   console.log('🤖 BOT DETECTED:', req.headers['user-agent']);
+//   done();
+// });
 
+// ✅ ใช้ Prerender Middleware ก่อนทุกอย่าง
+prerender.set('prerenderToken', 'MJVQROCR6ltrN10nVTn3');
+prerender.set('protocol', 'https');
+prerender.set('host', 'ymcshop.vercel.app'); // ให้ Prerender รู้ว่าจะดึงจาก frontend
+app.use(prerender);
 
+// ✅ ตั้งค่า CORS
+app.use(cors({
+  origin: ['https://ymcshop.vercel.app'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
+
+app.use('/', require('./routes/share'));
+
+// ✅ Middleware ทั่วไป
+app.use(morgan('dev'));
+app.use(express.json({ limit: '20mb' }));
+
+// ✅ โหลด route ทั้งหมด
+readdirSync('./routes').map((file) => {
+  app.use('/api', require('./routes/' + file));
+});
+
+// ✅ ไม่ต้องใช้ routes/share.js แล้วนะ (ลบออกได้)
+
+const port = process.env.PORT || 5001;
+app.listen(port, () => {
+  console.log('✅ SERVER RUNNING ON PORT', port);
+});
