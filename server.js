@@ -27,6 +27,7 @@ app.use(cors({
   credentials: true
 }));
 
+
 app.use('/', require('./routes/share'));
 
 // ✅ Middleware ทั่วไป
