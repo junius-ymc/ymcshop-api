@@ -7,23 +7,10 @@ const cors = require('cors')
 // const authRouter = require('./routes/auth')
 // const categoryRouter = require('./routes/category')
 
-const prerender = require('prerender-node') // ✅ เพิ่มตรงนี้
-prerender.set('prerenderToken', 'MJVQROCR6ltrN10nVTn3')
-prerender.set('protocol', 'https');
-prerender.set('host', 'ymcshop.vercel.app'); // frontend host
-app.use(prerender) // ✅ ใช้ middleware ก่อน router
-
 // middleware
 app.use(morgan('dev'))
 app.use(express.json({ limit: '20mb' }))
-
 app.use(cors())
-// app.use(cors({
-//     origin: ['https://ymcshop.vercel.app'], // ✅ ใส่ origin ของ frontend ให้ชัดเจน
-//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-//     credentials: true
-// }))
-
 // app.use('/api',authRouter)
 // app.use('/api',categoryRouter)
 readdirSync('./routes')
