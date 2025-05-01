@@ -7,6 +7,10 @@ const cors = require('cors')
 // const authRouter = require('./routes/auth')
 // const categoryRouter = require('./routes/category')
 
+const prerender = require('prerender-node') // ✅ เพิ่มตรงนี้
+prerender.set('prerenderToken', 'MJVQROCR6ltrN10nVTn3')
+app.use(prerender) // ✅ ใช้ middleware ก่อน router
+
 // middleware
 app.use(morgan('dev'))
 app.use(express.json({ limit: '20mb' }))
