@@ -1,4 +1,11 @@
-app.get('/prerender/*', (req, res) => {
-  // ส่งไปที่ frontend
-  res.redirect(`https://ymcshop.vercel.app${req.path.replace('/prerender', '')}${req.url.includes('?') ? '?' + req.url.split('?')[1] : ''}`);
+const express = require('express');
+const router = express.Router();
+
+router.get('/prerender/*', (req, res) => {
+  const targetPath = req.path.replace('/prerender', '');
+  const query = req.url.includes('?') ? '?' + req.url.split('?')[1] : '';
+  const redirectUrl = `https://ymcshop.vercel.app${targetPath}${query}`;
+  res.redirect(redirectUrl);
 });
+
+module.exports = router;
