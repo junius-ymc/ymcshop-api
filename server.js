@@ -4,8 +4,12 @@ const app = express()
 const morgan = require('morgan')
 const { readdirSync } = require('fs')
 const cors = require('cors')
+const prerender = require('prerender-node') // ✅ เพิ่มตรงนี้
 // const authRouter = require('./routes/auth')
 // const categoryRouter = require('./routes/category')
+
+prerender.set('prerenderToken', 'MJVQROCR6ltrN10nVTn3')
+app.use(prerender) // ✅ ใช้ middleware ก่อน router
 
 // middleware
 app.use(morgan('dev'))
