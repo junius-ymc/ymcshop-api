@@ -22,7 +22,6 @@ app.use(cors())
 //     credentials: true
 // }))
 
-
 // app.use('/api',authRouter)
 // app.use('/api',categoryRouter)
 readdirSync('./routes')
