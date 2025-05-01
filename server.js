@@ -9,10 +9,8 @@ const prerender = require('prerender-node');
 prerender.set('prerenderToken', 'MJVQROCR6ltrN10nVTn3');
 
 // ✅ log เวลา bot เข้า (optional แต่แนะนำ)
-prerender.set('beforeRender', function (req, done) {
-  console.log('🤖 BOT DETECTED:', req.headers['user-agent']);
-  done();
-});
+prerender.set('protocol', 'https');
+prerender.set('host', 'ymcshop.vercel.app'); // frontend host
 
 // ✅ ใช้ Prerender Middleware ก่อนทุกอย่าง
 app.use(prerender);
