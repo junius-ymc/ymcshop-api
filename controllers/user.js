@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma");
+const axios = require("axios");
 
 exports.listUsers = async (req, res) => {
   try {
@@ -57,7 +58,7 @@ exports.changeRole = async (req, res) => {
 exports.userCart = async (req, res) => {
   try {
     //code
-    const { cart } = req.body;
+    const { cart, shippingFee, grandTotal } = req.body;
     console.log(cart);
     console.log(req.user.id);
 
@@ -117,6 +118,8 @@ exports.userCart = async (req, res) => {
         },
         cartTotal: cartTotal,
         orderedById: user.id,
+        shippingFee,
+        grandTotal,
       },
     });
     console.log(newCart);
@@ -146,6 +149,8 @@ exports.getUserCart = async (req, res) => {
     res.json({
       products: cart.products,
       cartTotal: cart.cartTotal,
+      grandTotal: cart.grandTotal,
+      shippingFee: cart.shippingFee,
     });
   } catch (err) {
     console.log(err);
@@ -292,5 +297,38 @@ exports.getOrder = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Server Error" });
+  }
+};
+
+exports.getUserLocation = async (req, res) => {
+  try {
+    const clientIp =
+      req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
+
+    // ✅ ป้องกัน IP localhost ให้ใช้ IP จริงแค่ตอน dev เท่านั้น
+    if (
+      process.env.NODE_ENV !== "production" &&
+      (clientIp === "::1" || clientIp.startsWith("127.") || clientIp.includes("::ffff:127"))
+    ) {
+      clientIp = "8.8.8.8"; // ใช้ IP จริงจำลอง เช่น Google Public DNS
+    }
+
+    // const { data } = await axios.get(`https://ipapi.co/${clientIp}/json/`);
+    // const country = data.country_name || "Unknown";
+    // const countryCode = data.country || "xx";
+
+    // เอาไว้ทดสอบ
+    const country = "🇹🇭 ไทย";
+    const countryCode = "my";
+    console.log("countryCode:", countryCode);
+
+    res.json({
+      country,
+      countryCode: countryCode.toLowerCase(),
+      ip: clientIp,
+    });
+  } catch (err) {
+    console.error("Geo error:", err.message);
+    res.status(500).json({ error: "ไม่สามารถดึง location ได้" });
   }
 };

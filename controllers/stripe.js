@@ -17,7 +17,7 @@ exports.payment = async (req, res) => {
         orderedById: req.user.id,
       },
     });
-    const amountTHB = cart.cartTotal * 100;
+    const amountTHB = cart.grandTotal * 100;
 
     // Create a PaymentIntent with the order amount and currency
     const paymentIntent = await stripe.paymentIntents.create({
