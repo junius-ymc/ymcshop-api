@@ -313,14 +313,14 @@ exports.getUserLocation = async (req, res) => {
       clientIp = "8.8.8.8"; // ใช้ IP จริงจำลอง เช่น Google Public DNS
     }
 
-    // const { data } = await axios.get(`https://ipapi.co/${clientIp}/json/`);
-    // const country = data.country_name || "Unknown";
-    // const countryCode = data.country || "xx";
+    const { data } = await axios.get(`https://ipapi.co/${clientIp}/json/`);
+    const country = data.country_name || "Unknown";
+    const countryCode = data.country || "xx";
 
     // เอาไว้ทดสอบ
-    const country = "🇹🇭 ไทย";
-    const countryCode = "my";
-    console.log("countryCode:", countryCode);
+    // const country = "🇹🇭 ไทย";
+    // const countryCode = "my";
+    // console.log("countryCode:", countryCode);
 
     res.json({
       country,
