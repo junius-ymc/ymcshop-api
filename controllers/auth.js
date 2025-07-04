@@ -1,6 +1,7 @@
 const prisma = require('../config/prisma')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const nodemailer = require("nodemailer")
 
 exports.register = async (req, res) => {
     try {
@@ -108,3 +109,59 @@ exports.currentUser = async (req, res) => {
         res.status(500).json({ message: 'Server Error' })
     }
 }
+
+// 1. ขอ reset password (ส่งอีเมล)
+exports.forgotPassword = async (req, res) => {
+    const { email } = req.body;
+console.log(email);
+    try {
+        const user = await prisma.user.findUnique({ where: { email } });
+        if (!user) return res.status(404).json({ message: "This email was not found." });
+
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_RESET_SECRET, {
+            expiresIn: "5m",
+        });
+
+        const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${token}`;
+
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: "รีเซ็ตรหัสผ่าน YMC Shop",
+            html: `<p>คลิกลิงก์นี้เพื่อรีเซ็ตรหัสผ่าน:</p><a href="${resetLink}">${resetLink}</a>`,
+        });
+
+        res.json({ message: "Password reset link sent successfully." });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server Error !!!" });
+    }
+};
+
+// 2. เปลี่ยนรหัสผ่านใหม่
+exports.resetPassword = async (req, res) => {
+    const { token, password } = req.body;
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_RESET_SECRET);
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        await prisma.user.update({
+            where: { id: decoded.userId },
+            data: { password: hashedPassword },
+        });
+
+        res.json({ message: "Password reset successful." });
+    } catch (err) {
+        console.error(err);
+        res.status(400).json({ message: "Token is invalid or expired !!!" });
+    }
+};
