@@ -135,8 +135,8 @@ console.log(email);
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: email,
-            subject: "รีเซ็ตรหัสผ่าน YMC Shop",
-            html: `<p>คลิกลิงก์นี้เพื่อรีเซ็ตรหัสผ่าน:</p><a href="${resetLink}">${resetLink}</a>`,
+            subject: "Reset Password - YMC Shop",
+            html: `<p>Click this link to reset your password:</p><a href="${resetLink}" target="_blank">${resetLink}</a>`,
         });
 
         res.json({ message: "Password reset link sent successfully." });
